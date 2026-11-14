@@ -2,7 +2,7 @@
 
 An interactive prototype of **StudyTale**, a centralised, privacy-first study companion for university students with learning differences. Built for the UWPM ProdCon 2026 case, "Learning Without Limits".
 
-**Live site:** `https://YOUR-USERNAME.github.io/YOUR-REPO/](https://aditikarode.github.io/studytale/`
+**Live site:** `https://aditikarode.github.io/studytale/`
 
 ## What it shows
 - One schedule and weekly planner that pulls from Brightspace, Panopto, Microsoft 365 and Read&Write
