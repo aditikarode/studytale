@@ -2,7 +2,7 @@
 
 An interactive prototype of **StudyTale**, a centralised, privacy-first study companion for university students with learning differences. Built for the UWPM ProdCon 2026 case, "Learning Without Limits".
 
-**Live site:** `https://YOUR-USERNAME.github.io/YOUR-REPO/` (replace after publishing)
+**Live site:** `https://YOUR-USERNAME.github.io/YOUR-REPO/](https://aditikarode.github.io/studytale/`
 
 ## What it shows
 - One schedule and weekly planner that pulls from Brightspace, Panopto, Microsoft 365 and Read&Write
@@ -15,15 +15,9 @@ An interactive prototype of **StudyTale**, a centralised, privacy-first study co
 ## Using it
 Open the site and press **Demo 1: Week 1** or **Demo 2: Week 5** for a guided walkthrough, or click **Sign in** to explore. Everything runs in the browser. No data is sent or stored.
 
-Recorded walkthroughs are in [`videos/`](videos/).
-
 ## Files
 - `index.html`: the whole app (HTML, CSS and JavaScript in one file)
 - `videos/`: recorded demos (MP4)
-- `.nojekyll`: tells GitHub Pages to serve the files as they are
 
 ## Notes
 This is a prototype. Data, dates and figures are fictional, the tutor replies are scripted, and the privacy panel describes the proposed design rather than a deployed system. StudyTale is not affiliated with D2L, Panopto, Microsoft or Texthelp.
-
-## License
-Add a license before sharing widely (for example MIT, via GitHub's "Add file > Create new file > LICENSE").
