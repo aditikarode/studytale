@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StudyTale: an AI study companion prototype</title>
+<meta name="description" content="StudyTale is an interactive prototype of a centralised, privacy-first study companion for university students with learning differences.">
+<meta property="og:title" content="StudyTale prototype"><meta property="og:description" content="One dashboard for deadlines, lectures and study plans that adapts to how you learn. No diagnosis needed.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%F0%9F%9B%A1%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Cinzel:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e8ecea;--card:#f7f8f6;--ink:#1d2a2a;--mut:#566767;--acc:#2f5d62;--on:#fff;--gold:#9a6f1d;--ok:#2d6a45;--bad:#a23b3b;--line:#cfd8d5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#121a1c;--card:#1b2629;--ink:#e6ecea;--mut:#9fb2b0;--acc:#6fb7b0;--on:#0f1a1b;--gold:#e0b45a;--ok:#76c493;--bad:#e08a8a;--line:#2d3b3e}}
+:root[data-theme=dark]{--bg:#121a1c;--card:#1b2629;--ink:#e6ecea;--mut:#9fb2b0;--acc:#6fb7b0;--on:#0f1a1b;--gold:#e0b45a;--ok:#76c493;--bad:#e08a8a;--line:#2d3b3e}
+body[data-skin=sci-fi]{--acc:#5b45b5}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Atkinson Hyperlegible",system-ui,sans-serif;padding-bottom:90px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--card);z-index:10}
+[data-hide~=ECON] [data-c=ECON],[data-hide~=PSYC] [data-c=PSYC],[data-hide~=COMM] [data-c=COMM]{display:none}
+h1,h2,h3{font-family:Cinzel,Georgia,serif;margin:0 0 .4em}h1{font-size:1.5rem}h2{font-size:1.1rem}h3{font-size:1rem}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--line);padding:8px 14px}
+.top b{font-family:Cinzel,Georgia,serif;font-size:1.2rem;margin-right:auto}
+button{font:inherit;cursor:pointer}
+.btn{background:var(--acc);color:var(--on);border:0;border-radius:6px;padding:8px 14px;font-weight:700}.btn.g{background:transparent;color:var(--ink);border:1px solid var(--line)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}.press{transform:scale(.95)}
+.wrap{max-width:1040px;margin:0 auto;padding:16px}
+.scr{display:none}.scr.on{display:block}.vw{display:none}.vw.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+.mut,small{color:var(--mut)}small{display:block}
+.q{display:block;font-weight:700;margin:14px 0 6px}
+input[type=text],input[type=password]{width:100%;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);font:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:7px 13px}.chip.sel{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.note{border-left:4px solid var(--gold);padding:8px 12px;background:var(--bg);border-radius:0 6px 6px 0}
+ul{list-style:none;padding:0;margin:0}li{padding:8px 0;border-bottom:1px solid var(--line)}
+.tick{color:var(--ok);font-weight:700;visibility:hidden;float:right}.tick.on{visibility:visible}
+#ld{display:none;text-align:center;padding:36px}#ld.on{display:block}
+.shell{display:grid;grid-template-columns:190px 1fr;gap:14px}
+@media(max-width:760px){.shell,.g2{grid-template-columns:1fr!important}.nav{flex-direction:row!important;overflow:auto}}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nv{text-align:left;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px}.nv.on{background:var(--acc);color:var(--on)}
+.g2{display:grid;grid-template-columns:3fr 2fr;gap:12px}
+.sl li{display:flex;gap:10px;align-items:center}.dy{width:56px;font-weight:700;color:var(--acc)}.sl .t{flex:1}
+.src{font-size:.75rem;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--mut)}
+.tag{font-size:.75rem;border:1px solid var(--gold);color:var(--gold);border-radius:4px;padding:1px 6px;font-weight:700}
+.strip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.strip div{background:var(--bg);border-radius:8px;padding:8px;font-size:.85rem;min-height:70px}.strip b{display:block;color:var(--acc)}.strip span{display:block;margin-top:3px}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tile{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px 8px;color:var(--ink);text-align:center}
+.why li{font-size:.92rem}.bar{height:10px;background:var(--line);border-radius:5px;margin:4px 0 10px}.bar i{display:block;height:100%;border-radius:5px;background:var(--acc)}
+#refresh{border:2px solid var(--gold)}
+.vid{background:linear-gradient(135deg,#1f3a40,#0f1a1b);color:#e6ecea;border-radius:10px;min-height:220px;padding:14px;display:flex;flex-direction:column;justify-content:space-between}
+.chk{background:var(--card);color:var(--ink);border-radius:8px;padding:12px;margin:8px 0}
+.opt{display:block;width:100%;text-align:left;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:8px 12px;margin-top:6px}.opt.bad{border-color:var(--bad)}.opt.good{border-color:var(--ok)}
+#fb{margin-top:8px;font-weight:700}
+#chatbox{display:flex;flex-direction:column;height:430px}#chat{flex:1;overflow:auto;display:flex;flex-direction:column;gap:8px}
+.b{max-width:92%;padding:8px 12px;border-radius:10px;background:var(--bg)}.b.u{align-self:flex-end;background:var(--acc);color:var(--on)}
+.row{display:flex;gap:6px;margin-top:8px}.row input{flex:1}
+#mic.rec{background:var(--bad);color:#fff}
+#adapt{display:none;border:2px solid var(--gold)}#adapt.on{display:block}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}
+svg text{fill:var(--ink);font:12px "Atkinson Hyperlegible",sans-serif}.pin{cursor:pointer}
+#cur{position:fixed;left:0;top:0;width:22px;height:22px;z-index:60;pointer-events:none;display:none;transition:transform .7s ease}
+#cap{position:fixed;left:0;right:0;bottom:0;z-index:55;background:#10191b;color:#f1f5f4;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none}
+#cap i{display:block;height:3px;background:#e0b45a;width:0;transition:width .6s;margin-bottom:8px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body data-skin="medieval">
+<header class="top"><b>StudyTale</b><button class="btn" id="p1">▶ Demo 1: Week 1</button><button class="btn" id="p2">▶ Demo 2: Week 5</button><button class="btn g" id="pause">Pause</button><button class="btn g" id="restart">Reset</button><button class="btn g" id="fast">1×</button></header>
+<main class="wrap">
+<section id="s-login" class="scr on"><div class="card" style="max-width:430px;margin:24px auto"><h1>Northbridge sign in</h1><p class="note">Interactive prototype with sample data. Press a demo button above for a guided walkthrough, or click Sign in to explore on your own. Nothing you type is sent anywhere.</p>
+<label class="q" for="u">Student email</label><input id="u" type="text"><label class="q" for="p">Password</label><input id="p" type="password">
+<p><button class="btn" id="signin">Sign in</button></p>
+<ul id="linking" style="display:none"><li>Brightspace courses<span class="tick">✓</span></li><li>Panopto lectures<span class="tick">✓</span></li><li>Microsoft 365 calendar<span class="tick">✓</span></li><li>Read&amp;Write tools<span class="tick">✓</span></li></ul></div></section>
+
+<section id="s-form" class="scr"><div class="card" id="fc"><h1>Set up your study space</h1>
+<p class="note">Not a diagnosis. You never need to share a condition. These answers only set how your plan is paced, and you can change them anytime.</p>
+<div class="q">How do you like to spread out work?</div><div class="chips" id="g1"><button class="chip">Close to the deadline</button><button class="chip">Spread over weeks</button></div>
+<div class="q">Which course feels hardest right now?</div><div class="chips" id="g2"><button class="chip">ECON 101</button><button class="chip">PSYC 100</button><button class="chip">COMM 120</button></div>
+<div class="q">How long can you focus in one block?</div><div class="chips" id="g3"><button class="chip">15 min</button><button class="chip">25 min</button><button class="chip">45 min</button></div>
+<div class="q">How should we remind you?</div><div class="chips" id="g4" data-m="1"><button class="chip">Text message</button><button class="chip">Pop-up</button><button class="chip">Spoken alarm</button><button class="chip">Watch</button></div>
+<div class="q">Where do you study best?</div><div class="chips" id="g6"><button class="chip">Quiet</button><button class="chip">Busy</button></div>
+<div class="q">Pick a look</div><div class="chips" id="g5"><button class="chip">Medieval</button><button class="chip">Sci-fi</button><button class="chip">Plain</button></div>
+<p><button class="btn" id="build">Build my dashboard</button></p></div>
+<div id="ld" class="card"><h2>Building your quest log…</h2><p class="mut">Reading deadlines from Brightspace, Panopto and Outlook.</p></div></section>
+
+<section id="s-app" class="scr"><div class="shell"><nav class="nav"><button class="nv" data-v="chap">New Study Chapter</button><button class="nv on" data-v="sched">Schedule</button><button class="nv" data-v="map">Map</button><button class="nv" data-v="priv">Privacy</button></nav><div>
+<div class="vw on" id="v-sched">
+<div class="card" id="refresh" style="display:none"><h2>Learning Refresh: Week 5</h2><p class="mut">What your last 4 weeks of check-ins show. Only you see this. Sample data.</p>
+<div>Same-day check-ins: 90%</div><div class="bar"><i style="width:90%"></i></div><div>Same concepts 5 days later: 46%</div><div class="bar"><i style="width:46%;background:var(--bad)"></i></div>
+<p class="note">You follow lectures well, but details fade within days. This is a study pattern, not a diagnosis.</p>
+<ul><li>✓ Add a 2-min recap before each lecture</li><li>✓ Add 10-min recall quests on days 1, 3 and 7</li><li>✓ Let the study buddy quiz you on older topics</li></ul>
+<p><button class="btn" id="apply">Apply to my plan</button> <button class="btn g">Not now</button></p></div>
+<div class="card"><h2 id="hi">Welcome back, Ned</h2><div class="chips" id="key"><span class="mut">Show courses:</span><button class="chip sel" data-k="ECON">ECON</button><button class="chip sel" data-k="PSYC">PSYC</button><button class="chip sel" data-k="COMM">COMM</button></div></div>
+<div class="g2"><div><div class="card"><h2>Current schedule</h2><ul class="sl" id="sl"></ul></div><div class="card"><h2>This week</h2><div class="strip" id="strip"></div></div></div>
+<div><div class="card"><h2>Course hub</h2><div class="tiles"><button class="tile" id="hubECON">ECON 101</button><button class="tile">PSYC 100</button><button class="tile">COMM 120</button><button class="tile">Grades and news</button></div></div>
+<div class="card"><h2>Why this plan fits you</h2><ul class="why" id="why"></ul></div></div></div></div>
+
+<div class="vw" id="v-chap"><div class="card"><h1>New Study Chapter</h1>
+<label class="q">Chapter</label><input type="text" value="ECON 101: Supply and demand" aria-label="Chapter">
+<div class="q">Related materials (from Brightspace)</div><div class="chips"><button class="chip sel">Assignment #3</button><button class="chip sel">Lecture 6</button><button class="chip">Ch. 4 reading</button></div>
+<div class="q">Days until assessment: 4</div><p class="note">Recommended: 3 studying days, based on your past check-ins.</p>
+<div class="q">Hours per day</div><div class="chips" id="g7"><button class="chip">0.5 h</button><button class="chip sel">1 h</button><button class="chip">1.5 h</button></div>
+<div class="q">Location: <span id="loc">not chosen yet</span></div><p><button class="btn g" id="pick">Pick on the map</button></p>
+<p><button class="btn" id="addplan">Add to my plan</button></p></div></div>
+
+<div class="vw" id="v-map"><div class="card"><h1>Map</h1>
+<svg viewBox="0 0 600 260" width="100%" role="img" aria-label="Campus map"><rect width="600" height="260" rx="10" fill="var(--bg)"/><path d="M0 130H600M300 0V260" stroke="var(--line)" stroke-width="14"/>
+<rect x="40" y="30" width="180" height="70" fill="var(--line)"/><rect x="350" y="25" width="200" height="75" fill="var(--line)"/><rect x="60" y="160" width="190" height="75" fill="var(--line)"/><rect x="350" y="160" width="190" height="75" fill="var(--line)"/>
+<g class="pin" data-n="Campus Cafe" data-no="High" data-de="Dense" tabindex="0"><circle cx="130" cy="65" r="14" fill="var(--bad)"/><text x="95" y="95">Campus Cafe</text></g>
+<g class="pin" data-n="Library 3F Quiet Room" data-no="Low" data-de="Calm" tabindex="0"><circle cx="450" cy="62" r="14" fill="var(--ok)"/><text x="395" y="92">Library 3F</text></g>
+<g class="pin" data-n="Student Centre" data-no="Medium" data-de="Moderate" tabindex="0"><circle cx="150" cy="198" r="14" fill="var(--gold)"/><text x="105" y="228">Student Centre</text></g></svg>
+<div class="note" id="pc">Tap a pin to see noise and crowding right now.</div><p><button class="btn" id="addloc" style="display:none">Add to study plan</button></p></div></div>
+
+<div class="vw" id="v-priv"><h1>Privacy</h1><div class="card"><h2>What StudyTale stores</h2><p>Your profile uses a random key, <b>ST-7f3a-91c2</b>, instead of your name. The link between key and student stays with Northbridge.</p><table><tr><th>Stored under your key</th><th>Never stored</th></tr><tr><td>Study preferences, check-in results, planner choices</td><td>Name, email, diagnosis or medical details</td></tr><tr><td>Encrypted in transit and at rest, on Canadian servers</td><td>Voice recordings (speech becomes text, then is discarded)</td></tr></table></div><div class="card" id="pwho"><h2>Who can see what</h2><table><tr><th>You</th><td>Everything, in one place</td></tr><tr><th>Instructors</th><td>Class-wide patterns only, such as “many students stall at 34:12”</td></tr><tr><th>Accessibility Services</th><td>Only what you choose to share</td></tr><tr><th>Grading or discipline</th><td>Nothing, ever</td></tr></table></div><div class="card"><h2>Your controls</h2><button class="btn g" id="share">Share with Accessibility Services: Off</button> <button class="btn g" id="dl">Download my data</button> <button class="btn g" id="del">Delete my data</button><p class="note" id="pmsg">Changes here apply immediately.</p></div></div>
+<div class="vw" id="v-hub"><h1>ECON 101 hub</h1><div class="g2"><div>
+<div class="vid"><div>Lecture 6: Supply and demand</div><div class="chk"><b id="qt"></b><div id="opts"></div><div id="fb"></div><button class="btn" id="explain" style="display:none;margin-top:8px">🎤 Explain another way</button></div></div>
+<div class="card" id="adapt" style="margin-top:12px"><h3>I changed something. Keep it?</h3><p>You ask for examples first, so I now show a worked example before each new concept.</p><button class="btn" id="keep">Keep</button> <button class="btn g">Change</button> <button class="btn g">Turn off</button><p class="mut" id="ak">Nothing is shared with your instructors.</p></div></div>
+<div class="card" id="chatbox"><h2>Study buddy</h2><div id="chat"></div><div class="row"><button class="btn g" id="mic" aria-label="Speak">🎤</button><input id="in" type="text" aria-label="Type a question" placeholder="Type or tap the mic"><button class="btn" id="send">Send</button></div></div></div></div>
+</div></div></section></main>
+<footer class="wrap"><small>StudyTale is a student-built product prototype made for a case competition. All names, dates, scores and figures are fictional sample data. It is not affiliated with or endorsed by D2L, Panopto, Microsoft or Texthelp.</small></footer>
+<div id="cur"><svg viewBox="0 0 22 22" width="22" height="22"><path d="M3 2l15 9-7 1.5L8 19z" fill="#fff" stroke="#000" stroke-width="1.5"/></svg></div>
+<div id="cap"><i></i><span id="ct"></span></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const D=ms=>new Promise(r=>setTimeout(r,ms));
+let tok=0,paused=false,speed=1,stage="",W4=false,R=false,X=[],LOC="",P={};
+const defP=()=>({sp:"Spread over weeks",hard:"ECON",foc:"25 min",rem:["Pop-up","Spoken alarm"],q:"Quiet",skin:"Medieval"});
+const show=id=>{$$(".scr").forEach(s=>s.classList.toggle("on",s.id==="s-"+id));scrollTo(0,0)};
+const go=v=>{show("app");$$(".vw").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));$$(".nv").forEach(n=>n.classList.toggle("on",n.dataset.v===v));if(v==="hub")openHub();scrollTo(0,0)};
+const say=(w,h)=>{const d=document.createElement("div");d.className="b "+w;d.innerHTML=h;$("#chat").append(d);$("#chat").scrollTop=1e5};
+document.addEventListener("click",e=>{const c=e.target.closest(".chip");if(!c)return;const g=c.parentElement;
+ if(c.dataset.k){const h=new Set((document.body.dataset.hide||"").split(" ").filter(Boolean));c.classList.toggle("sel");c.classList.contains("sel")?h.delete(c.dataset.k):h.add(c.dataset.k);document.body.dataset.hide=[...h].join(" ");return}
+ if(g.dataset.m)c.classList.toggle("sel");else if(g.id){[...g.children].forEach(x=>x.classList.remove("sel"));c.classList.add("sel")}});
+$$(".nv").forEach(n=>n.onclick=()=>go(n.dataset.v));
+
+function render(){
+ const f=P.foc,s=P.sp.startsWith("Spread"),L=W4?["Sat 12","Sun 13","Mon 14","Tue 15","Wed 16"]:["Sat 14","Sun 15","Mon 16","Tue 17","Wed 18"];
+ let a=W4?[{c:"ECON",t:"Watch Lecture 11 with check-ins",m:"Panopto · "+f+" block",s:"Panopto",d:0,go:1},{c:"COMM",t:"Read Ch. 9 with text-to-speech",m:f+" block",s:"Read&Write",d:1},{c:"COMM",t:"Rehearse presentation",m:"Presentation Dec 15",s:"Microsoft 365",d:2},{c:"ECON",t:"Final exam, Exam Hall B, 7 pm",m:"Brightspace + Outlook",s:"Microsoft 365",d:6,dt:"Dec 18"}]
+ :[{c:"ECON",t:"Watch Lecture 6 with check-ins",m:"Panopto · "+f+" block",s:"Panopto",d:0,go:1},{c:"ECON",t:"Read Ch. 4 with text-to-speech",m:f+" block",s:"Read&Write",d:1},{c:"COMM",t:"Quiz prep, round 1 of 2",m:"Quiz Nov 19",s:"Brightspace",d:2},{c:"PSYC",t:"Essay outline (step 1 of 4)",m:s?"Due Dec 1, started 14 days early":"Due Dec 1",s:"Brightspace",d:s?3:9,dt:s?"":"Nov 23"},{c:"ECON",t:"Midterm, Exam Hall B, 7 pm",m:"Outlook calendar",s:"Microsoft 365",d:12,dt:"Nov 26"}];
+ if(W4&&R)a.push({c:"ECON",t:"2-min recap before Lecture 11",m:"Added by your Learning Refresh",s:"StudyTale",d:0,n:1},{c:"ECON",t:"Recall quest: Lectures 1 to 4 (10 min)",m:"Added by your Learning Refresh",s:"StudyTale",d:1,n:1},{c:"ECON",t:"Recall quest: Lectures 6 to 8 (10 min)",m:"Added by your Learning Refresh",s:"StudyTale",d:3,n:1});
+ a=a.concat(X).sort((x,y)=>x.d-y.d);
+ $("#sl").innerHTML=a.map(x=>`<li data-c="${x.c}"><span class="dy">${x.dt||L[x.d]||""}</span><span class="t">${x.t}<small>${x.m}</small></span>${x.c===P.hard&&x.d<2&&!x.n?'<span class="tag">Priority</span>':""}${x.n?'<span class="tag">NEW</span>':""}<span class="src">${x.s}</span>${x.go?'<button class="btn" id="open">Open</button>':""}</li>`).join("");
+ $("#strip").innerHTML=L.map((l,i)=>`<div><b>${l}</b>${a.filter(x=>x.d===i).map(x=>`<span data-c="${x.c}">${x.t}</span>`).join("")}</div>`).join("");
+ const o=$("#open");if(o)o.onclick=()=>go("hub");
+ $("#why").innerHTML=[["Pacing: "+P.sp,s?"Essay outline starts 14 days early":"Work is placed close to deadlines"],["Hardest: "+P.hard,P.hard+" tasks come first and are marked Priority"],["Focus: "+f,"Every study block is "+f+" long"],["Reminders: "+P.rem.join(", "),"Each reminder links to the exact task"],["Study spot: "+P.q,P.q==="Quiet"?"Map recommends quiet rooms first":"Map shows lively spots first"]].map(r=>`<li><b>${r[0]}</b><small>${r[1]}</small></li>`).join("");
+ $("#hi").textContent="Welcome back, Ned "+(P.skin==="Sci-fi"?"🚀":P.skin==="Plain"?"":"⚔️");document.body.dataset.skin=P.skin.toLowerCase();
+ $("#refresh").style.display=W4&&!R?"block":"none"}
+
+$("#signin").onclick=async()=>{$("#linking").style.display="block";for(const t of $$(".tick")){await D(450/speed);t.classList.add("on")}await D(600/speed);show("form")};
+$("#build").onclick=()=>{const v=g=>$$("#"+g+" .sel").map(x=>x.textContent),d=defP();
+ P={sp:v("g1")[0]||d.sp,hard:(v("g2")[0]||"ECON").slice(0,4),foc:v("g3")[0]||d.foc,rem:v("g4").length?v("g4"):d.rem,q:v("g6")[0]||d.q,skin:v("g5")[0]||d.skin};
+ $("#fc").style.display="none";$("#ld").classList.add("on");
+ setTimeout(()=>{$("#fc").style.display="";$("#ld").classList.remove("on");render();go("sched")},1500/speed)};
+$("#hubECON").onclick=()=>go("hub");$("#pick").onclick=()=>go("map");
+$("#apply").onclick=()=>{R=true;render()};
+$("#addplan").onclick=()=>{X.push({c:"ECON",t:"Review: Supply and demand, 3 days",m:"Repeated review @ "+(LOC||"anywhere")+" · "+($("#g7 .sel")||{}).textContent,s:"StudyTale",d:1,n:1});render();go("sched")};
+$$(".pin").forEach(p=>p.onclick=()=>{const q=p.dataset.no==="Low"&&P.q==="Quiet";$("#pc").innerHTML=`<b>${p.dataset.n}</b><br>Noise: ${p.dataset.no} · Right now: ${p.dataset.de}${q?"<br>✓ Matches your quiet preference":""}`;$("#addloc").style.display="inline-block";$("#addloc").dataset.n=p.dataset.n});
+$("#addloc").onclick=()=>{LOC=$("#addloc").dataset.n;$("#loc").textContent=LOC;go("chap")};
+
+function setQ(q,o,ok){$("#qt").textContent=q;$("#opts").innerHTML=o.map((t,i)=>`<button class="opt" ${i===ok?'data-ok="1"':""}>${t}</button>`).join("");$("#fb").textContent="";$("#explain").style.display="none"}
+function openHub(){stage="";if($("#chat").children.length===0)say("a","Hi Ned. Ask me about this course. I answer from your course materials and link every source.");
+ W4?setQ("Recall quest (Lecture 3, 9 days ago): what does price elasticity measure?",["How fast prices rise","How much demand changes when price changes","Total supply in a market"],1):setQ("Check-in at 12:40: if the price of coffee rises, what happens to quantity demanded?",["Rises","Falls","Stays the same"],1)}
+$("#opts").onclick=e=>{const o=e.target.closest(".opt");if(!o)return;
+ if(o.dataset.ok){o.classList.add("good");$("#fb").style.color="var(--ok)";$("#fb").textContent=W4?"✓ Nice recall. Saved to your Learning Passport.":"✓ Check-in passed. Saved to your Learning Passport.";if(!W4)setTimeout(()=>$("#adapt").classList.add("on"),1400/speed)}
+ else{o.classList.add("bad");$("#fb").style.color="var(--bad)";$("#fb").textContent="Not quite. Want it explained another way?";$("#explain").style.display="inline-block"}};
+const ex=async()=>{if(stage)return;stage="ex";$("#mic").classList.add("rec");
+ say("u",W4?"🎤 “I don’t remember this one. Can you give me another example?”":"🎤 “I don’t understand. Can you give me another example?”");await D(1100/speed);$("#mic").classList.remove("rec");
+ say("a",W4?"Elasticity is how strongly buyers react to a price change. If skate decks double in price and sales halve, demand is elastic. <b>Your turn:</b> what happens if a bus pass doubles in price? <a href='#'>📎 Lecture 3, 18:20</a>":"Think skate decks 🛹. If a deck jumps from $60 to $120, would you buy as many? <b>Your turn:</b> what happens to how many decks people buy? <a href='#'>📎 Lecture 6, 12:40</a>")};
+$("#explain").onclick=ex;$("#mic").onclick=ex;
+const send=async()=>{const t=$("#in").value.trim();if(!t)return;say("u",t);$("#in").value="";await D(800/speed);
+ if(/midterm|when|deadline|final/i.test(t))say("a","Your ECON 101 "+(W4?"final is Friday Dec 18":"midterm is Thursday Nov 26")+", 7 pm, Exam Hall B. <a href='#'>📎 Brightspace › Syllabus</a>");
+ else if(stage==="ex"){stage="done";if(W4){X.push({c:"ECON",t:"Recall quest: price elasticity (5 min)",m:"Repeat in 3 days · you missed it today",s:"StudyTale",d:3,n:1});render();say("a","Right: people still need the bus, so demand barely moves. I’ll ask again in 3 days and added it to your planner. <a href='#'>📎 Lecture 3, 18:20</a>")}
+  else say("a","Yes! Higher price, fewer buyers. Try the check-in again ↑ <a href='#'>📎 Lecture 6, 12:40</a>")}
+ else say("a","Here’s what the lecture says. <a href='#'>📎 Source</a>")};
+$("#send").onclick=send;$("#in").onkeydown=e=>{if(e.key==="Enter")send()};
+$("#keep").onclick=()=>{$("#ak").textContent="Saved. Review it any time in Settings › What I adapted."};
+
+function reset(m){tok++;paused=false;$("#pause").textContent="Pause";$("#cur").style.display=$("#cap").style.display="none";
+ W4=m===4;R=false;X=[];LOC="";stage="";P=defP();document.body.dataset.hide="";$$(".chip").forEach(c=>c.dataset.k?c.classList.add("sel"):0);
+ ["#u","#p","#in"].forEach(s=>$(s).value="");$("#linking").style.display="none";$$(".tick").forEach(t=>t.classList.remove("on"));
+ $$("#s-form .chip").forEach(c=>c.classList.remove("sel"));$("#chat").innerHTML="";$("#adapt").classList.remove("on");$("#loc").textContent="not chosen yet";$("#pc").textContent="Tap a pin to see noise and crowding right now.";$("#addloc").style.display="none";
+ $("#ld").classList.remove("on");$("#pmsg").textContent="Changes here apply immediately.";$("#share").textContent="Share with Accessibility Services: Off";$("#del").textContent="Delete my data";delete $("#del").dataset.c;render();W4?go("sched"):show("login")}
+async function run(m,fn,steps){reset(m);const my=tok;let n=0;
+ const w=async ms=>{await D(ms/speed);while(paused){await D(100);if(my!==tok)throw 0}if(my!==tok)throw 0};
+ const cap=t=>{$("#ct").textContent=t;$("#cap i").style.width=(++n/steps*100)+"%"};const cur=$("#cur");cur.style.display="block";$("#cap").style.display="block";
+ const mv=async s=>{const el=typeof s==="string"?$(s):s;el.scrollIntoView({block:"center"});await w(300);const r=el.getBoundingClientRect();cur.style.transform=`translate(${r.left+r.width/2}px,${r.top+r.height/2}px)`;await w(800)};
+ const ck=async s=>{const el=$(s);await mv(el);el.classList.add("press");await w(200);el.classList.remove("press");el.dispatchEvent(new MouseEvent("click",{bubbles:true}))};
+ const ty=async(s,t)=>{await mv(s);for(const c of t){$(s).value+=c;await w(60)}};
+ try{await fn({w,cap,mv,ck,ty});cur.style.display="none";$("#cap i").style.width="100%"}catch(e){}}
+$("#p1").onclick=()=>run(1,async h=>{const{w,cap,mv,ck,ty}=h;
+ cap("Ned signs in with his normal university login. His four platforms link automatically.");await ty("#u","ned.marsh@northbridge.ca");await ty("#p","••••••••••");await ck("#signin");await w(3600);
+ cap("A short preferences form. No diagnosis and no disclosure, just how Ned likes to work.");await ck("#g1 .chip:nth-child(2)");await ck("#g2 .chip:nth-child(1)");await ck("#g3 .chip:nth-child(2)");await ck("#g4 .chip:nth-child(2)");await ck("#g4 .chip:nth-child(3)");await ck("#g6 .chip:nth-child(1)");await ck("#g5 .chip:nth-child(1)");await ck("#build");await w(2800);
+ cap("One schedule, four platforms. Panopto, Brightspace, Outlook and Read&Write tasks sit in one list and one weekly planner.");await mv("#sl");await w(3200);
+ cap("Every choice Ned made is visible: spread-out essay, ECON as priority, 25-minute blocks.");await mv("#why");await w(3500);
+ cap("Course key: Ned filters the planner to one course at a time.");await ck("[data-k=PSYC]");await ck("[data-k=COMM]");await w(1500);await ck("[data-k=PSYC]");await ck("[data-k=COMM]");
+ cap("New Study Chapter: the planner recommends 3 study days based on past check-ins.");await ck("[data-v=chap]");await w(2800);
+ cap("Ned wants a quiet spot, so the map recommends the library room over the busy cafe.");await ck("#pick");await ck(".pin:nth-of-type(1)");await w(1500);await ck(".pin:nth-of-type(2)");await w(1800);await ck("#addloc");
+ cap("He adds the chapter to his plan, and it lands in the schedule.");await ck("#addplan");await w(3000);
+ cap("In the ECON hub, a lecture check-in asks if he understood. He gets it wrong.");await ck("#open");await w(1200);await ck(".opt:nth-of-type(1)");await w(1200);
+ cap("He asks for another example by voice. The tutor explains, then asks him to try it.");await ck("#explain");await w(3200);await ty("#in","They buy fewer");await ck("#send");await w(2400);
+ cap("He passes the check-in. Understanding is measured, not logins.");await ck(".opt[data-ok]");await w(3200);
+ cap("StudyTale shows what it adapted and why. Ned stays in control.");await ck("#keep");await w(2200);cap("Privacy: Ned sees what is stored, under a random key and not his name. Instructors only get class-wide patterns.");await ck("[data-v=priv]");await mv("#pwho");await w(4500);await ck("#share");await w(1200);cap("Demo 1 complete. Try Demo 2 for week 5, or explore the app yourself.")},14);
+$("#p2").onclick=()=>run(4,async h=>{const{w,cap,mv,ck,ty}=h;
+ cap("Four weeks later. StudyTale’s weekly Learning Refresh has new data from Ned’s check-ins and midterm.");await w(3500);
+ cap("It compares same-day check-ins with later recall and spots a retention pattern. It is not a diagnosis.");await mv("#refresh .bar:nth-of-type(2)");await w(4000);
+ cap("Ned applies the suggestions and the planner refreshes with recall quests.");await ck("#apply");await mv("#sl");await w(3800);
+ cap("In the hub, a recall quest from Lecture 3 appears. He misses it.");await ck("#open");await w(1200);await ck(".opt:nth-of-type(1)");await w(1200);
+ cap("The tutor explains it a new way and asks him to apply it.");await ck("#explain");await w(3200);await ty("#in","Demand barely changes");await ck("#send");await w(2800);
+ cap("The missed concept is scheduled for a repeat in 3 days.");await ck("[data-v=sched]");await mv("#sl");await w(3500);cap("Demo 2 complete. The plan changed because the data did.")},8);
+$("#share").onclick=e=>{const on=e.target.textContent.endsWith("Off");e.target.textContent="Share with Accessibility Services: "+(on?"On":"Off")};
+$("#dl").onclick=()=>{$("#pmsg").textContent="Your data export is ready as a file you can keep."};
+$("#del").onclick=()=>{if($("#del").dataset.c){$("#pmsg").textContent="Deleted. Your key, preferences and check-in history are removed.";delete $("#del").dataset.c;$("#del").textContent="Delete my data"}else{$("#del").dataset.c=1;$("#del").textContent="Click again to confirm";$("#pmsg").textContent="This removes your key, preferences and history."}};
+$("#restart").onclick=()=>reset(1);
+$("#pause").onclick=()=>{paused=!paused;$("#pause").textContent=paused?"Resume":"Pause"};
+$("#fast").onclick=()=>{speed=speed===1?2:1;$("#fast").textContent=speed+"×"};
+reset(1);
+</script></body></html>
